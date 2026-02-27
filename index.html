@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Loyalty Badge</title>
+  <style>
+    :root{
+      --bg:#f5f6f8;
+      --card:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --accent:#0284c7;
+      --accent-weak:#e0f2fe;
+      --shadow: 0 8px 30px rgba(17,24,39,.08);
+      --radius: 16px;
+      --max: 1080px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    *{ box-sizing: border-box; }
+    body{
+      margin:0;
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .wrap{
+      max-width: var(--max);
+      margin: 28px auto 56px;
+      padding: 0 18px;
+    }
+
+    .topbar{
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px 18px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .issued{
+      display:flex;
+      align-items:center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .avatar-wrap{
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #fff, #f3f4f6);
+      overflow: hidden;
+      flex: 0 0 auto;
+      display:grid;
+      place-items:center;
+    }
+
+    .avatar-img{
+      width: 44px;
+      height: 44px;
+      object-fit: cover;
+      display:block;
+    }
+
+    .avatar-fallback{
+      font-weight: 700;
+      color:#374151;
+      font-size: 14px;
+    }
+
+    .issued-text{
+      min-width: 0;
+      line-height: 1.25;
+    }
+
+    .issued-text .line1{
+      font-size: 14px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .issued-text .name{
+      font-size: 14px;
+      font-weight: 650;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .issued-text .line2{
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .actions{
+      display:flex;
+      gap: 10px;
+      flex: 0 0 auto;
+    }
+
+    .btn{
+      appearance:none;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: #111827;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 650;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      transition: transform .06s ease, border-color .15s ease, box-shadow .15s ease;
+    }
+
+    .btn:hover{
+      border-color: #cbd5e1;
+      box-shadow: 0 6px 18px rgba(17,24,39,.08);
+    }
+
+    .btn:active{ transform: translateY(1px); }
+
+    .btn.primary{
+      border-color: var(--accent);
+      color: var(--accent);
+      background: #fff;
+    }
+
+    .btn.secondary{
+      border-color: var(--accent);
+      background: var(--accent-weak);
+      color:#075985;
+    }
+
+    .main{
+      margin-top: 18px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .badge-card{
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      background: #fff;
+    }
+
+    .badge-img{
+      width: 100%;
+      height: auto;
+      display:block;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #f9fafb;
+    }
+
+    .badge-note{
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    h1{
+      margin: 2px 0 8px;
+      font-size: 34px;
+      letter-spacing: -0.02em;
+    }
+
+    .meta{
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .meta a{
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 650;
+    }
+
+    .desc{
+      font-size: 15px;
+      line-height: 1.6;
+      color: #374151;
+      margin: 10px 0 14px;
+      max-width: 72ch;
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 8px 0 14px;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 13px;
+      color:#374151;
+      background:#fff;
+    }
+
+    .chip .dot{
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      opacity: .9;
+    }
+
+    .section{
+      margin-top: 18px;
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+    }
+
+    .section h2{
+      margin: 0 0 10px;
+      font-size: 16px;
+      letter-spacing: -0.01em;
+    }
+
+    ul.criteria{
+      margin: 0;
+      padding-left: 18px;
+      color:#374151;
+      line-height: 1.65;
+    }
+
+    .skill-tags{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .tag{
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      background: #fff;
+    }
+
+    .footer{
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--muted);
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+
+    .code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background:#f3f4f6;
+      border: 1px solid var(--line);
+      padding: 6px 8px;
+      border-radius: 10px;
+      color:#111827;
+    }
+
+    .modal-backdrop{
+      position: fixed;
+      inset: 0;
+      background: rgba(17,24,39,.45);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      z-index: 50;
+    }
+
+    .modal{
+      width: min(520px, 100%);
+      background:#fff;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      box-shadow: 0 20px 70px rgba(0,0,0,.25);
+      padding: 16px;
+    }
+
+    .modal h3{
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .modal p{
+      margin: 8px 0;
+      color:#374151;
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .modal .row{
+      display:flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .confetti{
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 60;
+      display:none;
+    }
+
+    .confetti i{
+      position: absolute;
+      top: -12px;
+      width: 10px;
+      height: 16px;
+      opacity: .95;
+      border-radius: 2px;
+      transform: translate3d(0,0,0) rotate(0deg);
+      animation: fall linear forwards;
+    }
+
+    @keyframes fall{
+      to{
+        transform: translate3d(var(--dx), 110vh, 0) rotate(var(--rot));
+      }
+    }
+
+    @media (max-width: 860px){
+      .grid{ grid-template-columns: 1fr; }
+      h1{ font-size: 28px; }
+      .actions{ width: 100%; justify-content: flex-start; flex-wrap: wrap; }
+      .topbar{ flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="issued">
+        <div class="avatar-wrap" aria-label="Recipient photo">
+          <img class="avatar-img" id="avatarImg" src="assets/partner-icon.png" alt="Recipient photo" />
+          <span class="avatar-fallback" id="avatarFallback" style="display:none;">PL</span>
+        </div>
+
+        <div class="issued-text">
+          <div class="line1">
+            This badge was issued to
+            <a class="name" href="#" id="recipientLink">Phan Le Thao Nhi</a>
+          </div>
+          <div class="line2">Date issued: <span id="issueDate">27 February 2026</span></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="verifyBtn" type="button">Verify</button>
+        <button class="btn secondary" id="celebrateBtn" type="button">Celebrate</button>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="grid">
+        <div class="badge-card">
+          <img class="badge-img" id="badgeImg" src="assets/loyalty-badge.png" alt="Loyalty Badge artwork" />
+          <div class="badge-note">If the image does not load, verify the file names in /assets match the HTML.</div>
+        </div>
+
+        <div>
+          <h1 id="badgeTitle">Loyalty Badge</h1>
+
+          <div class="meta">
+            Issued by <a href="https://faizkrisnadi.com" id="issuerLink">Faiz Krisnadi</a>
+          </div>
+
+          <div class="desc" id="description">
+            A one-of-one badge made for you. Verified by me, because I have seen your loyalty in the small, everyday choices, across 518 days together.
+          </div>
+
+          <div class="chips" aria-label="badge attributes">
+            <span class="chip"><span class="dot"></span> Personal</span>
+            <span class="chip"><span class="dot"></span> Verified</span>
+            <span class="chip"><span class="dot"></span> 518 days</span>
+            <span class="chip"><span class="dot"></span> Not for sale</span>
+          </div>
+
+          <div class="section">
+            <h2>How it is earned</h2>
+            <ul class="criteria" id="criteria">
+              <li>Protect trust through honesty, consistency, and care.</li>
+              <li>Choose "us" in the little moments, not only the big ones.</li>
+              <li>Communicate clearly, especially when it is uncomfortable.</li>
+              <li>Stay steady under stress and fix things with maturity and respect.</li>
+              <li>Make teamwork feel natural: supportive, dependable, and kind.</li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <h2>Recognized strengths</h2>
+            <div class="skill-tags" id="skills">
+              <span class="tag">Consistency</span>
+              <span class="tag">Trustworthiness</span>
+              <span class="tag">Honest communication</span>
+              <span class="tag">Thoughtful care</span>
+              <span class="tag">Patience</span>
+              <span class="tag">Supportive teamwork</span>
+              <span class="tag">Resilience</span>
+              <span class="tag">Calm presence</span>
+            </div>
+
+            <div class="footer">
+              <span>Verification ID:</span>
+              <span class="code" id="verificationId">LOVE-27092024</span>
+              <button class="btn" id="copyBtn" type="button">Copy</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <h3 id="modalTitle">Verification</h3>
+      <p id="modalBody"></p>
+      <div class="row">
+        <button class="btn" id="closeModalBtn" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+  <script>
+    const DATA = {
+      recipientName: "Phan Le Thao Nhi",
+      recipientUrl: "#",
+      issuerName: "Faiz Krisnadi",
+      issuerUrl: "https://faizkrisnadi.com",
+      issueDate: "27 February 2026",
+      badgeTitle: "Loyalty Badge",
+      verificationId: "LOVE-27092024",
+      description:
+        "A one-of-one badge made for you. Verified by me, because I have seen your loyalty in the small, everyday choices, across 518 days together.",
+      avatarImage: "assets/partner-icon.png",
+      badgeImage: "assets/loyalty-badge.png"
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function initials(name){
+      const parts = String(name).trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) return "NA";
+      const a = parts[0][0] || "";
+      const b = (parts[1] && parts[1][0]) || (parts[0] && parts[0][1]) || "";
+      return (a + b).toUpperCase();
+    }
+
+    $("recipientLink").textContent = DATA.recipientName;
+    $("recipientLink").href = DATA.recipientUrl;
+    $("issuerLink").textContent = DATA.issuerName;
+    $("issuerLink").href = DATA.issuerUrl;
+    $("issueDate").textContent = DATA.issueDate;
+    $("badgeTitle").textContent = DATA.badgeTitle;
+    $("description").textContent = DATA.description;
+    $("verificationId").textContent = DATA.verificationId;
+
+    $("avatarImg").src = DATA.avatarImage;
+    $("badgeImg").src = DATA.badgeImage;
+
+    const fallback = $("avatarFallback");
+    fallback.textContent = initials(DATA.recipientName);
+
+    $("avatarImg").addEventListener("error", () => {
+      $("avatarImg").style.display = "none";
+      fallback.style.display = "inline";
+    });
+
+    const modalBackdrop = $("modalBackdrop");
+    const modalBody = $("modalBody");
+
+    function openModal(text){
+      modalBody.textContent = text;
+      modalBackdrop.style.display = "flex";
+    }
+
+    function closeModal(){
+      modalBackdrop.style.display = "none";
+    }
+
+    $("verifyBtn").addEventListener("click", () => {
+      openModal(
+        "Verified. This badge was issued to " + DATA.recipientName + " on " + DATA.issueDate + ". " +
+        "Verification ID: " + DATA.verificationId + "."
+      );
+    });
+
+    $("closeModalBtn").addEventListener("click", closeModal);
+    modalBackdrop.addEventListener("click", (e) => {
+      if (e.target === modalBackdrop) closeModal();
+    });
+
+    $("copyBtn").addEventListener("click", async () => {
+      try{
+        await navigator.clipboard.writeText(DATA.verificationId);
+        openModal("Copied the Verification ID to clipboard.");
+      }catch{
+        openModal("Could not copy automatically. You can manually copy the Verification ID.");
+      }
+    });
+
+    const confettiLayer = $("confetti");
+
+    function celebrate(){
+      confettiLayer.innerHTML = "";
+      confettiLayer.style.display = "block";
+
+      const n = 140;
+      const w = window.innerWidth;
+      for(let i=0;i<n;i++){
+        const piece = document.createElement("i");
+        const left = Math.random() * w;
+        const dx = (Math.random() * 220 - 110) + "px";
+        const rot = (Math.random() * 720 - 360) + "deg";
+        const dur = (Math.random() * 1.6 + 1.8).toFixed(2) + "s";
+        const delay = (Math.random() * 0.25).toFixed(2) + "s";
+
+        piece.style.left = left + "px";
+        piece.style.setProperty("--dx", dx);
+        piece.style.setProperty("--rot", rot);
+        piece.style.animationDuration = dur;
+        piece.style.animationDelay = delay;
+        piece.style.background = "hsl(" + Math.floor(Math.random() * 360) + " 90% 55%)";
+
+        confettiLayer.appendChild(piece);
+      }
+
+      setTimeout(() => {
+        confettiLayer.style.display = "none";
+        confettiLayer.innerHTML = "";
+      }, 3200);
+    }
+
+    $("celebrateBtn").addEventListener("click", celebrate);
+  </script>
+</body>
+</html>
